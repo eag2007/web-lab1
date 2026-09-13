@@ -25,5 +25,5 @@ dist-ssr
 package-lock.json
 .prettierrc
 
-src/html/test_design.html
+test_design.html
 node_modules
