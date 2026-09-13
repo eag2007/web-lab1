@@ -1,0 +1,15 @@
+{
+  "name": "lab1",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.5",
+    "vite": "^8.1.5"
+  }
+}
