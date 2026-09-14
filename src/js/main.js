@@ -2,13 +2,21 @@ const buttonCheck = document.getElementById('check-button');
 const buttonClear = document.getElementById('clear-button');
 const logs = document.getElementById('logs');
 const canvas = document.getElementById('canvas');
-const context = canvas.getContext('2d')
+const context = canvas.getContext('2d');
 
 context.translate(canvas.width / 2, canvas.height / 2);
 context.scale(1, -1);
 
 global_r = 1;
 array = [];
+
+var isDragging = false;
+var lastX = 0;
+var lastY = 0;
+
+var zoom = 1;
+var offsetX = 0;
+var offsetY = 0;
 
 const toDecimal = (value) => {
   value = value.trim();
@@ -68,13 +76,20 @@ const clickCheckButton = () => {
                                 <td>${tmp}</td>
                            </tr>`;
 
-  array.push([x, y, r, is_range, tmp])
+  array.push([x, y, r, is_range, tmp]);
 
   clearCanvas();
   drawArea();
   draw();
-  drawText('X', canvas.width / 2 - 15, 0);
-  drawText('Y', 0, -canvas.height / 2 + 15);
+  drawText('X',
+    (canvas.width / 2 - offsetX) / zoom - 15 / zoom,
+    10 / zoom
+  );
+  drawText(
+    'Y',
+    10 / zoom,
+    (canvas.height / 2 + offsetY) / zoom - 15 / zoom,
+  );
   drawValues();
   drawPoints(array);
 };
@@ -87,8 +102,15 @@ const clickClearButton = () => {
   array = [];
   drawArea();
   draw();
-  drawText('X', canvas.width / 2 - 15, 0);
-  drawText('Y', 0, -canvas.height / 2 + 15);
+  drawText('X',
+    (canvas.width / 2 - offsetX) / zoom - 15 / zoom,
+    10 / zoom
+  );
+  drawText(
+    'Y',
+    10 / zoom,
+    (canvas.height / 2 + offsetY) / zoom - 15 / zoom,
+  );
   drawValues();
 };
 
@@ -104,43 +126,28 @@ const checkRange = (x, y) => {
 };
 
 const draw = () => {
-  // рисуем стрелку вверх
-  context.beginPath();
-  context.moveTo(0, 0);
-  context.lineTo(0, canvas.height / 2 - 25);
-  context.strokeStyle = 'black';
-  context.lineWidth = 1;
-  context.stroke();
+  const width = canvas.width / zoom + Math.abs(offsetX) / zoom;
+  const height = canvas.height / zoom + Math.abs(offsetY) / zoom;
 
-  // рисуем стрелку вниз
   context.beginPath();
-  context.moveTo(0, 0);
-  context.lineTo(0, -canvas.height / 2 + 25);
-  context.strokeStyle = 'black';
-  context.lineWidth = 1;
-  context.stroke();
 
-  // рисуем стрелку вправо
-  context.beginPath();
-  context.moveTo(0, 0);
-  context.lineTo(canvas.width / 2 - 25, 0);
-  context.strokeStyle = 'black';
-  context.lineWidth = 1;
-  context.stroke();
+  context.moveTo(-width, 0);
+  context.lineTo(width, 0);
 
-  // рисуем стрелку влево
-  context.beginPath();
-  context.moveTo(0, 0);
-  context.lineTo(-canvas.width / 2 + 25, 0);
+  context.moveTo(0, height);
+  context.lineTo(0, -height);
+
+  context.lineWidth = 1 / zoom;
   context.strokeStyle = 'black';
-  context.lineWidth = 1;
   context.stroke();
 };
 
 const drawText = (text, x, y) => {
-  context.scale(1, -1);
-  context.fillText(text, x, y);
-  context.scale(1, -1);
+  context.save();
+  context.translate(x, y);
+  context.scale(1 / zoom, -1 / zoom);
+  context.fillText(text, 0, 0);
+  context.restore();
 };
 
 const drawValues = () => {
@@ -164,27 +171,67 @@ const drawValues = () => {
     context.stroke();
   };
 
-
   // x
-  tickX(-xStep * 2);
-  drawText(`${-global_r}`, -xStep * 2, 15);
-  tickX(-xStep);
-  drawText(`${-global_r / 2}`, -xStep, 15);
-  tickX(xStep);
-  drawText(`${global_r / 2}`, xStep, 15);
-  tickX(xStep * 2);
-  drawText(`${global_r}`, xStep * 2, 15);
+  let n = 1;
+  let start = 0.5;
+  while (canvas.width / zoom > xStep * n * zoom) {
+    tickX(xStep * n);
+    drawText(`${start}`, xStep * n, 15);
+    n++;
+    if (zoom < 0.24) {
+      start += 1.5;
+      n++;
+      n++;
+    } else {
+      start += 0.5;
+    }
+  }
 
+  n = 1;
+  start = -0.5;
+  while (-canvas.width / zoom < -xStep * n * zoom) {
+    tickX(-xStep * n);
+    drawText(`${start}`, -xStep * n, 15);
+    n++;
+    if (zoom < 0.24) {
+      start -= 1.5;
+      n++;
+      n++;
+    } else {
+      start -= 0.5;
+    }
+  }
 
   // y
-  tickY(yStep * 2);
-  drawText(`${global_r}`, 15, -yStep * 2);
-  tickY(yStep);
-  drawText(`${global_r / 2}`, 20, -yStep);
-  tickY(-yStep);
-  drawText(`${-global_r / 2}`, 25, yStep);
-  tickY(-yStep * 2);
-  drawText(`${-global_r}`, 15, yStep * 2);
+  n = 1;
+  start = 0.5;
+  while (canvas.height / zoom > xStep * n * zoom) {
+    tickY(yStep * n);
+    drawText(`${start}`, 15, yStep * n);
+    n++;
+    if (zoom < 0.24) {
+      start += 1.5;
+      n++;
+      n++;
+    } else {
+      start += 0.5;
+    }
+  }
+
+  n = 1;
+  start = -0.5;
+  while (-canvas.height / zoom < -yStep * n * zoom) {
+    tickY(-yStep * n);
+    drawText(`${start}`, 15, -yStep * n);
+    n++;
+    if (zoom < 0.24) {
+      start -= 1.5;
+      n++;
+      n++;
+    } else {
+      start -= 0.5;
+    }
+  }
 };
 
 const drawArea = () => {
@@ -197,8 +244,8 @@ const drawArea = () => {
   context.save();
 
   context.fillStyle = 'rgba(0, 122, 255, 0.22)';
-  context.strokeStyle = 'rgba(0, 122, 255, 0.55)';
-  context.lineWidth = 1.5;
+  context.strokeStyle = 'rgba(0, 122, 255, 0.22)';
+  context.lineWidth = 1.5 / zoom;
 
   // четверть круга слева сверху
   context.beginPath();
@@ -227,35 +274,112 @@ const drawArea = () => {
 };
 
 const clearCanvas = () => {
-  context.clearRect(
-    -canvas.width / 2,
-    -canvas.height / 2,
-    canvas.width,
-    canvas.height,
-  );
-  draw()
+  context.save();
+
+  context.setTransform(1, 0, 0, 1, 0, 0);
+  context.clearRect(0, 0, canvas.width, canvas.height);
+
+  context.restore();
 };
 
 const drawPoints = (points) => {
   const xStep = canvas.width / 6;
   const yStep = canvas.height / 6;
 
-  points.forEach(([x, y]) => {
-    const px = (x * xStep * 2) / global_r;
-    const py = (y * yStep * 2) / global_r;
+  points.forEach(([x, y, r, flag, time]) => {
+    const px = (x * xStep * 2) / r;
+    const py = (y * yStep * 2) / r;
 
     context.beginPath();
     context.arc(px, py, 6, 0, Math.PI * 2);
     context.fillStyle = 'blue';
     context.fill();
   });
+  context.fillStyle = 'black';
 };
+
+const drawZoomUpdate = (zoom) => {
+  // сбросим scale наш
+  context.setTransform(1, 0, 0, 1, 0, 0);
+
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.translate(canvas.width / 2 + offsetX, canvas.height / 2 + offsetY);
+  context.scale(zoom, -zoom);
+
+  drawArea();
+  draw();
+  drawText('X',
+    (canvas.width / 2 - offsetX) / zoom - 15 / zoom,
+    10 / zoom
+  );
+  drawText(
+    'Y',
+    10 / zoom,
+    (canvas.height / 2 + offsetY) / zoom - 15 / zoom,
+  );
+  drawValues();
+  drawPoints(array);
+};
+
+const zoomOperation = (event) => {
+  event.preventDefault();
+  if (event.deltaY < 0) {
+    zoom = Math.min(zoom * 1.1, 15);
+  }
+
+  if (event.deltaY > 0) {
+    zoom = Math.max(zoom / 1.1, 0.11);
+  }
+  console.log(zoom);
+  drawZoomUpdate(zoom);
+};
+
+const selectedFromMove = (event) => {
+  isDragging = true;
+
+  lastX = event.clientX;
+  lastY = event.clientY;
+};
+
+const moveMouse = (event) => {
+  if (!isDragging) {
+    return;
+  }
+
+  const dx = event.clientX - lastX;
+  const dy = event.clientY - lastY;
+
+  offsetX += dx;
+  offsetY += dy;
+
+  lastX = event.clientX;
+  lastY = event.clientY;
+
+  drawZoomUpdate(zoom);
+};
+
+const unselectedFromMove = (event) => {
+  isDragging = false;
+};
+
+canvas.addEventListener('wheel', zoomOperation);
+canvas.addEventListener('mousedown', selectedFromMove);
+canvas.addEventListener('mousemove', moveMouse);
+
+window.addEventListener('mouseup', unselectedFromMove);
 
 buttonCheck.addEventListener('click', clickCheckButton);
 buttonClear.addEventListener('click', clickClearButton);
 
 drawArea();
 draw();
-drawText('X', canvas.width / 2 - 15, 0);
-drawText('Y', 0, -canvas.height / 2 + 15);
+drawText('X',
+  (canvas.width / 2 - offsetX) / zoom - 15 / zoom,
+  10 / zoom
+);
+drawText(
+  'Y',
+  10 / zoom,
+  (canvas.height / 2 + offsetY) / zoom - 15 / zoom,
+);
 drawValues();

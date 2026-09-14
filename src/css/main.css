@@ -272,7 +272,7 @@ canvas {
     aspect-ratio: 764 / 650;
 
     border-radius: 17px;
-    border: 1px solid rgba(255, 255, 255, 0.65);
+    border: 1px solid rgb(157 201 220 / 0.65);
 
     background: linear-gradient(
             145deg,
