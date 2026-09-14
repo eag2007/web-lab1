@@ -8,10 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="author" content="Гунько Евгений Алексеевич">
     <meta name="description" content="Веб-программирование: Лабораторная работа №1.">
-    <meta name="keywords" content="ITMO, ИТМО, ПИиКТ, ВТ, Лабораторная работа, Веб-программирование"/>
     <link rel="stylesheet" href="src/css/main.css">
-    <link rel="preconnect" href="https://rsms.me/">
-    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
     <title>web-lab1</title>
 </head>
 
@@ -54,24 +51,66 @@
     <div class="graphics-coordinates">
         <div class="blocks graphics">
             <h2>График</h2>
-            <canvas>
+            <canvas width="764" height="650" id="canvas">
 
             </canvas>
         </div>
 
         <div class="blocks coordinates">
             <h2>Проверка точки</h2>
-            <h5>Координата x</h5>
-            <input>
-            <h5>Координата y</h5>
-            <input>
+            <div class="poles">
+                <label>Координата X:</label>
+                <select id="x">
+                    <option>-5</option>
+                    <option>-4</option>
+                    <option>-3</option>
+                    <option>-2</option>
+                    <option>-1</option>
+                    <option>0</option>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                </select>
+            </div>
+            <div class="poles">
+                <label>Координата Y:</label>
+                <input type="text" placeholder="от -3 до 3" id="y">
+            </div>
+            <div class="poles">
+                <label>Значение R:</label>
+                <input type="text" placeholder="от 2 до 5" id="r">
+            </div>
+            <div id="logs">
+            </div>
+            <button id="check-button">Проверить</button>
+            <button id="clear-button">Очистить</button>
         </div>
     </div>
 </main>
 
 <section>
+    <div class="table">
+        <h3 id="table-name">Таблица результата</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Координата X</th>
+                    <th>Координата Y</th>
+                    <th>Значение R</th>
+                    <th>Состояние</th>
+                    <th>Время проверки</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
 
 </section>
+
+<script src="https://cdn.jsdelivr.net/npm/decimal.js@10/decimal.min.js"></script>
+<script src="src/js/main.js"></script>
 
 </body>
 
