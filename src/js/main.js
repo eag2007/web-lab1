@@ -7,8 +7,6 @@ const context = canvas.getContext('2d')
 context.translate(canvas.width / 2, canvas.height / 2);
 context.scale(1, -1);
 
-const now = new Date();
-
 global_r = 1;
 array = [];
 
@@ -58,18 +56,19 @@ const clickCheckButton = () => {
   }
 
   global_r = r;
-  let tmp = now.toLocaleString('ru-RU');
+  let tmp = new Date().toLocaleString('ru-RU');
+  let is_range = checkRange(x, y) ? 'Попала' : 'Не попала';
 
   const value_table = document.getElementsByTagName('tbody')[0];
   value_table.innerHTML += `<tr>
                                 <td>${x}</td>
                                 <td>${y}</td>
                                 <td>${r}</td>
-                                <td>${checkRange(x, y) ? 'Попала' : 'Не попала'}</td>
+                                <td>${is_range}</td>
                                 <td>${tmp}</td>
                            </tr>`;
 
-  array.push([x, y, r, checkRange(x, y), tmp])
+  array.push([x, y, r, is_range, tmp])
 
   clearCanvas();
   drawArea();
@@ -98,7 +97,7 @@ const checkRange = (x, y) => {
     return true;
   } else if (x >= -global_r && x <= 0 && -y <= 0 && y >= -global_r / 2) {
     return true;
-  } else if (x ** 2 + y ** 2 <= global_r ** 2 && x <= 0 && y <= 0) {
+  } else if (x ** 2 + y ** 2 <= global_r ** 2 && x <= 0 && y >= 0) {
     return true;
   }
   return false;
