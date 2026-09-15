@@ -284,7 +284,7 @@ export const createPoint = (event) => {
   y = (y / (2 * yStep)) * global_r;
 
   const is_range = checkRange(x, y) ? 'Попала' : 'Не попала';
-  const time = new Date().toLocaleString('ru-RU');
+  const time = Date.now();
   const point = [x, y, global_r, is_range, time];
 
   points.push(point);

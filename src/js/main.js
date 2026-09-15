@@ -46,7 +46,7 @@ const clickCheckButton = () => {
 
   setGlobalR(r);
 
-  const tmp = new Date().toLocaleString('ru-RU');
+  const tmp = Date.now();
   const is_range = checkRange(x, y) ? 'Попала' : 'Не попала';
   const point = [x, y, r, is_range, tmp];
 

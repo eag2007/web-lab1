@@ -90,6 +90,7 @@ nav:hover {
 
 .profile-text {
     font-family: monospace;
+    font-size: 14px;
 }
 
 .profile-description {
@@ -302,9 +303,9 @@ button {
 }
 
 input {
-    width: 120px;
+    width: 140px;
     height: 35px;
-    padding: 0 10px;
+    padding: 2% 4%;
 
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.65);
@@ -317,10 +318,14 @@ input {
     outline: none;
 }
 
+input[type="text"] {
+    box-sizing: border-box;
+}
+
 select {
     width: 140px;
     height: 37px;
-    padding: 0 10px;
+    padding: 2% 4%;
 
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.65);
@@ -488,4 +493,52 @@ table {
     color: rgba(180, 30, 30, 0.8);
     font-family: "Inter", sans-serif;
     font-size: 15px;
+}
+
+@media (max-width: 1100px) {
+    #check-button,
+    #clear-button {
+        position: static;
+
+        width: 100%;
+        margin: 10px 0 0 0;
+    }
+}
+
+@media (max-width: 800px) {
+    .graphics-coordinates {
+        flex-direction: column;
+    }
+
+    .graphics,
+    .coordinates {
+        width: 100%;
+        box-sizing: border-box;
+        flex-direction: column;
+    }
+
+    .poles {
+        flex-direction: column;
+    }
+
+    canvas {
+        max-width: none;
+        width: 100%;
+    }
+
+    #logs {
+        width: 100%;
+        box-sizing: border-box;
+
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    #check-button,
+    #clear-button {
+        position: static;
+
+        width: 100%;
+        margin: 10px 0 0 0;
+    }
 }
