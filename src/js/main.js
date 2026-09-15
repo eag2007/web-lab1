@@ -7,8 +7,8 @@ const context = canvas.getContext('2d');
 context.translate(canvas.width / 2, canvas.height / 2);
 context.scale(1, -1);
 
-global_r = 1;
-array = [];
+var global_r = 1;
+var array = JSON.parse(localStorage.getItem('points')) || [];
 
 var isDragging = false;
 var lastX = 0;
@@ -77,6 +77,7 @@ const clickCheckButton = () => {
                            </tr>`;
 
   array.push([x, y, r, is_range, tmp]);
+  localStorage.setItem('points', JSON.stringify(array));
 
   clearCanvas();
   drawArea();
@@ -98,8 +99,9 @@ const clickClearButton = () => {
   hideError();
   let values_table = document.getElementsByTagName('tbody')[0];
   values_table.innerHTML = '';
-  clearCanvas();
   array = [];
+  localStorage.removeItem('points');
+  clearCanvas();
   drawArea();
   draw();
   drawText('X',
@@ -173,63 +175,63 @@ const drawValues = () => {
 
   // x
   let n = 1;
-  let start = 0.5;
+  let start = global_r / 2;
   while (canvas.width / zoom > xStep * n * zoom) {
     tickX(xStep * n);
     drawText(`${start}`, xStep * n, 15);
     n++;
     if (zoom < 0.24) {
-      start += 1.5;
+      start += global_r / 2 * 3;
       n++;
       n++;
     } else {
-      start += 0.5;
+      start += global_r / 2;
     }
   }
 
   n = 1;
-  start = -0.5;
+  start = -global_r / 2;
   while (-canvas.width / zoom < -xStep * n * zoom) {
     tickX(-xStep * n);
     drawText(`${start}`, -xStep * n, 15);
     n++;
     if (zoom < 0.24) {
-      start -= 1.5;
+      start -= global_r / 2 * 3;
       n++;
       n++;
     } else {
-      start -= 0.5;
+      start -= global_r / 2;
     }
   }
 
   // y
   n = 1;
-  start = 0.5;
+  start = global_r / 2;
   while (canvas.height / zoom > xStep * n * zoom) {
     tickY(yStep * n);
     drawText(`${start}`, 15, yStep * n);
     n++;
     if (zoom < 0.24) {
-      start += 1.5;
+      start += global_r / 2 * 3;
       n++;
       n++;
     } else {
-      start += 0.5;
+      start += global_r / 2;
     }
   }
 
   n = 1;
-  start = -0.5;
+  start = -global_r / 2;
   while (-canvas.height / zoom < -yStep * n * zoom) {
     tickY(-yStep * n);
     drawText(`${start}`, 15, -yStep * n);
     n++;
     if (zoom < 0.24) {
-      start -= 1.5;
+      start -= global_r * 3 / 2;
       n++;
       n++;
     } else {
-      start -= 0.5;
+      start -= global_r / 2;
     }
   }
 };
@@ -287,8 +289,8 @@ const drawPoints = (points) => {
   const yStep = canvas.height / 6;
 
   points.forEach(([x, y, r, flag, time]) => {
-    const px = (x * xStep * 2) / r;
-    const py = (y * yStep * 2) / r;
+    const px = (x * xStep * 2) / global_r;
+    const py = (y * yStep * 2) / global_r;
 
     context.beginPath();
     context.arc(px, py, 6, 0, Math.PI * 2);
@@ -330,7 +332,6 @@ const zoomOperation = (event) => {
   if (event.deltaY > 0) {
     zoom = Math.max(zoom / 1.1, 0.11);
   }
-  console.log(zoom);
   drawZoomUpdate(zoom);
 };
 
@@ -352,6 +353,15 @@ const moveMouse = (event) => {
   offsetX += dx;
   offsetY += dy;
 
+  const xStep = canvas.width / 6;
+  const yStep = canvas.height / 6;
+
+  const maxOffsetX = (300 * 2 * xStep * zoom) / global_r;
+  const maxOffsetY = (300 * 2 * yStep * zoom) / global_r;
+
+  offsetX = Math.max(-maxOffsetX, Math.min(maxOffsetX, offsetX));
+  offsetY = Math.max(-maxOffsetY, Math.min(maxOffsetY, offsetY));
+
   lastX = event.clientX;
   lastY = event.clientY;
 
@@ -362,9 +372,56 @@ const unselectedFromMove = (event) => {
   isDragging = false;
 };
 
+const createPoint = (event) => {
+  const rect = canvas.getBoundingClientRect();
+
+  let x = (event.clientX - rect.left) * canvas.width / rect.width;
+  let y = (event.clientY - rect.top) * canvas.height / rect.height;
+
+  x = (x - canvas.width / 2 - offsetX) / zoom;
+  y = -(y - canvas.height / 2 - offsetY) / zoom;
+
+  const xStep = canvas.width / 6;
+  const yStep = canvas.height / 6;
+
+  x = x / (2 * xStep) * global_r;
+  y = y / (2 * yStep) * global_r;
+
+  const is_range = checkRange(x, y) ? "Попала" : "Не попала";
+  const time = new Date().toLocaleString('ru-RU');
+
+  const points = [x, y, global_r, is_range, time];
+  array.push(points);
+  localStorage.setItem('points', JSON.stringify(array));
+
+  const value_table = document.getElementsByTagName('tbody')[0];
+  value_table.innerHTML += `<tr>
+                                <td>${x}</td>
+                                <td>${y}</td>
+                                <td>${global_r}</td>
+                                <td>${is_range}</td>
+                                <td>${time}</td>
+                           </tr>`;
+  drawZoomUpdate(zoom);
+};
+
+const addToTable = () => {
+  const value_table = document.getElementsByTagName('tbody')[0];
+  for (i of array) {
+    value_table.innerHTML += `<tr>
+                                <td>${i[0]}</td>
+                                <td>${i[1]}</td>
+                                <td>${i[2]}</td>
+                                <td>${i[3]}</td>
+                                <td>${i[4]}</td>
+                           </tr>`;
+  }
+};
+
 canvas.addEventListener('wheel', zoomOperation);
 canvas.addEventListener('mousedown', selectedFromMove);
 canvas.addEventListener('mousemove', moveMouse);
+canvas.addEventListener('dblclick', createPoint);
 
 window.addEventListener('mouseup', unselectedFromMove);
 
@@ -383,3 +440,5 @@ drawText(
   (canvas.height / 2 + offsetY) / zoom - 15 / zoom,
 );
 drawValues();
+addToTable();
+drawPoints(array);
