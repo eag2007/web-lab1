@@ -542,3 +542,11 @@ table {
         margin: 10px 0 0 0;
     }
 }
+
+@media (max-width: 900px) {
+    header {
+        position: static !important;
+        top: auto !important;
+        z-index: auto !important;
+    }
+}
