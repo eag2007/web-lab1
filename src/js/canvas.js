@@ -1,5 +1,6 @@
 import { points, global_r, checkRange } from './points.js';
-import { savePoints } from './storage.js';
+import { loadLines, savePoints } from './storage.js';
+import { createLine } from './lines.js';
 import { addPointToTable } from './table.js';
 
 export const canvas = document.getElementById('canvas');
@@ -199,6 +200,29 @@ export const drawPoints = (points) => {
   context.fillStyle = 'black';
 };
 
+export const drawLinesForPoints = () => {
+  const xStep = canvas.width / 6;
+  const yStep = canvas.height / 6;
+
+  context.save();
+  context.strokeStyle = 'red';
+  context.lineWidth = 2 / zoom;
+
+  loadLines().forEach(([x_first, y_first, x_second, y_second, r]) => {
+    const x1 = (x_first * xStep * 2) / r;
+    const y1 = (y_first * yStep * 2) / r;
+    const x2 = (x_second * xStep * 2) / r;
+    const y2 = (y_second * yStep * 2) / r;
+
+    context.beginPath();
+    context.moveTo(x1, y1);
+    context.lineTo(x2, y2);
+    context.stroke();
+  });
+
+  context.restore();
+};
+
 export const drawZoomUpdate = (zoom) => {
   context.setTransform(1, 0, 0, 1, 0, 0);
 
@@ -214,6 +238,7 @@ export const drawZoomUpdate = (zoom) => {
   drawText('Y', 10 / zoom, (canvas.height / 2 + offsetY) / zoom - 15 / zoom);
 
   drawValues();
+  drawLinesForPoints();
   drawPoints(points);
 };
 
@@ -290,6 +315,7 @@ export const createPoint = (event) => {
   points.push(point);
 
   savePoints(points);
+  createLine(x, y, global_r);
   addPointToTable(point);
 
   drawZoomUpdate(zoom);

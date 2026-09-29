@@ -9,3 +9,15 @@ export const savePoints = (points) => {
 export const clearPoints = () => {
   localStorage.removeItem('points');
 };
+
+export const loadLines = () => {
+  return JSON.parse(localStorage.getItem('lines')) || [];
+};
+
+export const saveLines = (lines) => {
+  localStorage.setItem('lines', JSON.stringify(lines))
+};
+
+export const clearLines = () => {
+  localStorage.removeItem('lines')
+};

@@ -1,5 +1,6 @@
 import { points, setGlobalR, checkRange } from './points.js';
-import { savePoints, clearPoints } from './storage.js';
+import { savePoints, clearPoints, clearLines } from './storage.js';
+import { createLine } from './lines.js';
 import { toDecimal, showError, hideError } from './validation.js';
 import { addPointToTable, clearTable, addToTable } from './table.js';
 
@@ -53,6 +54,7 @@ const clickCheckButton = () => {
   points.push(point);
 
   savePoints(points);
+  createLine(x, y, r);
   addPointToTable(point);
 
   drawZoomUpdate(zoom);
@@ -64,6 +66,7 @@ const clickClearButton = () => {
   points.length = 0;
 
   clearPoints();
+  clearLines();
   clearTable();
 
   drawZoomUpdate(zoom);
