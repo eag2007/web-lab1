@@ -208,11 +208,11 @@ export const drawLinesForPoints = () => {
   context.strokeStyle = 'red';
   context.lineWidth = 2 / zoom;
 
-  loadLines().forEach(([x_first, y_first, x_second, y_second, r]) => {
-    const x1 = (x_first * xStep * 2) / r;
-    const y1 = (y_first * yStep * 2) / r;
-    const x2 = (x_second * xStep * 2) / r;
-    const y2 = (y_second * yStep * 2) / r;
+  loadLines().forEach(([x_first, y_first, x_second, y_second]) => {
+    const x1 = (x_first * xStep * 2) / global_r;
+    const y1 = (y_first * yStep * 2) / global_r;
+    const x2 = (x_second * xStep * 2) / global_r;
+    const y2 = (y_second * yStep * 2) / global_r;
 
     context.beginPath();
     context.moveTo(x1, y1);

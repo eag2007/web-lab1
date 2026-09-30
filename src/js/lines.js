@@ -10,9 +10,7 @@ export const createLine = (x, y, global_R) => {
   }
 
   for (const point of points.slice(0, -1)) {
-    const [x_point, y_point, r_point] = point;
-    const pointX = (x_point * global_R) / r_point;
-    const pointY = (y_point * global_R) / r_point;
+    const [pointX, pointY] = point;
     const distance = (x - pointX) ** 2 + (y - pointY) ** 2;
 
     if (distance < distation) {
